@@ -1,0 +1,23 @@
+[package]
+name = "tauri-plugin-shopsavvy"
+version = "0.1.0"
+description = "Tauri v2 plugin for product search, price comparison, price history, and deals powered by ShopSavvy"
+authors = ["ShopSavvy by Monolith Technologies, Inc. <business@shopsavvy.com>"]
+homepage = "https://shopsavvy.com/integrations/tauri"
+repository = "https://github.com/shopsavvy/tauri-plugin-shopsavvy"
+license = "MIT"
+edition = "2021"
+rust-version = "1.75"
+keywords = ["tauri", "tauri-plugin", "shopsavvy", "shopping", "ecommerce"]
+categories = ["api-bindings", "web-programming"]
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+thiserror = "1.0"
+tokio = { version = "1", features = ["macros", "rt"] }
+
+[package.metadata.docs.rs]
+all-features = true

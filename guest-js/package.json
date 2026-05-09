@@ -1,0 +1,37 @@
+{
+  "name": "@shopsavvy/tauri-plugin",
+  "version": "0.1.0",
+  "description": "TypeScript bindings for tauri-plugin-shopsavvy",
+  "homepage": "https://shopsavvy.com/integrations/tauri",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shopsavvy/tauri-plugin-shopsavvy"
+  },
+  "license": "MIT",
+  "author": "ShopSavvy by Monolith Technologies, Inc.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@tauri-apps/api": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  }
+}

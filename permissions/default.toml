@@ -1,0 +1,30 @@
+"$schema" = "../gen/schemas/default-input-schema.json"
+
+[default]
+description = "Default permissions for tauri-plugin-shopsavvy."
+permissions = [
+    "allow-search-products",
+    "allow-get-offers",
+    "allow-get-price-history",
+    "allow-get-deals",
+]
+
+[[permission]]
+identifier = "allow-search-products"
+description = "Enables the search_products command."
+commands.allow = ["search_products"]
+
+[[permission]]
+identifier = "allow-get-offers"
+description = "Enables the get_offers command."
+commands.allow = ["get_offers"]
+
+[[permission]]
+identifier = "allow-get-price-history"
+description = "Enables the get_price_history command."
+commands.allow = ["get_price_history"]
+
+[[permission]]
+identifier = "allow-get-deals"
+description = "Enables the get_deals command."
+commands.allow = ["get_deals"]
