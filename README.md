@@ -58,11 +58,22 @@ const history = await getPriceHistory("012345678905", 180)
 const deals   = await getDeals({ category: "electronics", limit: 8, sort: "top-day" })
 ```
 
+Every command returns the Data API's JSON response unchanged ([response formats](https://shopsavvy.com/data/documentation)). Failures reject with a message string, e.g. `API returned status 401: {...}` or the missing-API-key error.
+
+| Command | Data API request |
+|---|---|
+| `search_products(query, limit?)` | `GET /v1/products/search?q=&limit=` |
+| `get_offers(identifier)` | `GET /v1/products/offers?ids=` (barcode, ASIN, URL, model number or ShopSavvy ID) |
+| `get_price_history(identifier, days?)` | `GET /v1/products/offers/history?ids=&start=&end=`, covering the last `days` days (default 30, UTC) |
+| `get_deals(options?)` | `GET /v1/deals`, options passed through as query parameters; `sort` defaults to `hot`, `limit` to 20 |
+
 ## Test
 
 ```bash
 ./test.sh
 ```
+
+Runs the Rust unit tests, the plugin IPC tests (the plugin mounted on Tauri's mock runtime with `shopsavvy:default` granted, answering from a local stand-in for the API), and the guest-js checks.
 
 ## License
 

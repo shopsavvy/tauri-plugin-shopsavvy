@@ -6,6 +6,8 @@ REQUIRED=(
   src/lib.rs
   src/commands.rs
   src/error.rs
+  build.rs
+  tests/plugin_ipc.rs
   permissions/default.toml
   guest-js/package.json
   guest-js/tsconfig.json
@@ -22,9 +24,9 @@ done
 echo "  all files present"
 
 if command -v cargo >/dev/null 2>&1; then
-  echo "==> cargo check"
-  cargo check --quiet
-  echo "  cargo check OK"
+  echo "==> cargo test (unit tests + plugin IPC tests on Tauri's mock runtime)"
+  cargo test --quiet
+  echo "  cargo test OK"
 fi
 
 if command -v bun >/dev/null 2>&1; then
