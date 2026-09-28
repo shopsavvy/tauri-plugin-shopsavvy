@@ -55,7 +55,7 @@ import { searchProducts, getOffers, getPriceHistory, getDeals } from "@shopsavvy
 const results = await searchProducts("AirPods Pro", 10)
 const offers  = await getOffers("012345678905")
 const history = await getPriceHistory("012345678905", 180)
-const deals   = await getDeals({ category: "electronics", limit: 8, sort: "trending" })
+const deals   = await getDeals({ category: "electronics", limit: 8, sort: "top-day" })
 ```
 
 ## Test

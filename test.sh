@@ -28,8 +28,8 @@ if command -v cargo >/dev/null 2>&1; then
 fi
 
 if command -v bun >/dev/null 2>&1; then
-  echo "==> guest-js typecheck + build"
-  (cd guest-js && bun install --silent && bun run typecheck && bun run build)
+  echo "==> guest-js typecheck + build + test"
+  (cd guest-js && bun install --silent && bun run typecheck && bun run build && bun test)
   if [ ! -f guest-js/dist/index.js ] || [ ! -f guest-js/dist/index.mjs ]; then
     echo "ERROR: guest-js dual ESM/CJS build missing"
     exit 1
