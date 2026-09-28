@@ -1,11 +1,24 @@
 {
   "name": "@shopsavvy/tauri-plugin",
   "version": "0.1.0",
-  "description": "TypeScript bindings for tauri-plugin-shopsavvy",
+  "description": "TypeScript bindings for tauri-plugin-shopsavvy: product search, price comparison, price history, and deals in Tauri v2 apps",
+  "keywords": [
+    "tauri",
+    "tauri-plugin",
+    "shopsavvy",
+    "price-comparison",
+    "price-history",
+    "deals",
+    "shopping"
+  ],
   "homepage": "https://shopsavvy.com/integrations/tauri",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shopsavvy/tauri-plugin-shopsavvy"
+    "url": "git+https://github.com/shopsavvy/tauri-plugin-shopsavvy.git",
+    "directory": "guest-js"
+  },
+  "bugs": {
+    "url": "https://github.com/shopsavvy/tauri-plugin-shopsavvy/issues"
   },
   "license": "MIT",
   "author": "ShopSavvy by Monolith Technologies, Inc.",
@@ -14,23 +27,37 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
   ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "typecheck": "tsc --noEmit"
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "peerDependencies": {
-    "@tauri-apps/api": ">=2.0.0"
+    "@tauri-apps/api": "^2.0.0"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^20.0.0",
     "@tauri-apps/api": "^2.0.0",
+    "@types/bun": "latest",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0"
   }
