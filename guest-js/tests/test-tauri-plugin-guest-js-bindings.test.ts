@@ -11,6 +11,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { clearMocks, mockIPC } from '@tauri-apps/api/mocks'
 import { getDeals, getOffers, getPriceHistory, searchProducts } from '../src/index'
+import type { OffersResponse, PriceHistoryResponse, SearchResponse } from '../src/index'
 
 const crateRoot = join(import.meta.dir, '..', '..')
 const commandsRs = readFileSync(join(crateRoot, 'src', 'commands.rs'), 'utf8')
@@ -57,9 +58,39 @@ function mockPlugin(responses: Record<string, unknown>) {
 afterEach(() => clearMocks())
 
 describe('guest-js bindings', () => {
-  const searchResponse = { success: true, data: [{ shopsavvy: 'p1', title: 'AirPods Pro' }], pagination: { total: 1, limit: 10, offset: 0, returned: 1 } }
-  const offersResponse = { success: true, data: [{ shopsavvy: 'p1', title: 'AirPods Pro', offers: [{ id: 'o1', retailer: 'amazon.com', price: 189.99 }] }] }
-  const historyResponse = { success: true, data: [{ id: 'o1', retailer: 'amazon.com', history: [{ timestamp: '2026-09-01T00:00:00Z', price: 199 }] }] }
+  const searchResponse: SearchResponse = { success: true, data: [{ shopsavvy: 'p1', title: 'AirPods Pro' }], pagination: { total: 1, limit: 10, offset: 0, returned: 1 } }
+  const offersResponse: OffersResponse = { success: true, data: [{ shopsavvy: 'p1', title: 'AirPods Pro', offers: [{ id: 'o1', retailer: 'Amazon', price: 189.99, seller: null }] }] }
+  // The real /products/offers/history shape, which get_price_history passes through
+  // unchanged: one entry PER PRODUCT, each offer carrying its own history, newest first
+  // (a null-currency archived point; an eBay listing with no history).
+  const historyResponse: PriceHistoryResponse = {
+    success: true,
+    data: [{
+      shopsavvy: 'p1',
+      title: 'AirPods Pro',
+      brand: 'Apple',
+      category: null,
+      offers: [
+        {
+          id: 'o1',
+          availability: 'in',
+          condition: 'new',
+          retailer: 'Amazon',
+          currency: 'USD',
+          price: 189.99,
+          seller: null,
+          URL: 'https://www.amazon.com/dp/B0CHWRXH8B',
+          timestamp: '2026-09-01T00:00:00Z',
+          history: [
+            { availability: 'in', price: 189.99, currency: 'USD', timestamp: '2026-09-01T00:00:00Z' },
+            { price: 199, currency: null, timestamp: '2026-08-20T00:00:00Z' },
+          ],
+        },
+        { id: 'o2', condition: 'used', retailer: 'eBay', currency: 'USD', price: 149, seller: 'audio_reseller', history: [] },
+      ],
+    }],
+    meta: { credits_used: 2, credits_remaining: 998 },
+  }
   const dealsResponse = { success: true, deals: [{ title: 'Deal', grade: { letter: 'A', value: 95 } }], pagination: { total: 1, has_more: false, limit: 8, offset: 0 } }
 
   test('each binding invokes the plugin command with the expected args and returns its result', async () => {
@@ -70,9 +101,14 @@ describe('guest-js bindings', () => {
       get_deals: dealsResponse,
     })
 
-    expect(await searchProducts('AirPods Pro', 10)).toEqual(searchResponse as never)
-    expect(await getOffers('012345678905')).toEqual(offersResponse as never)
-    expect(await getPriceHistory('012345678905', 180)).toEqual(historyResponse as never)
+    expect(await searchProducts('AirPods Pro', 10)).toEqual(searchResponse)
+    expect(await getOffers('012345678905')).toEqual(offersResponse)
+    const history = await getPriceHistory('012345678905', 180)
+    expect(history).toEqual(historyResponse)
+    // the declared type walks the real nesting: products -> offers -> history
+    expect(history.data[0].offers[0].history.map((point) => point.price)).toEqual([189.99, 199])
+    expect(history.data[0].offers[0].history[1].currency).toBeNull()
+    expect(history.data[0].offers[1].history).toEqual([])
     expect(await getDeals({ category: 'electronics', limit: 8, sort: 'top-day' })).toEqual(dealsResponse as never)
 
     expect(calls).toEqual([

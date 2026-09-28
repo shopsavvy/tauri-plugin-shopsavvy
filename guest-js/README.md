@@ -26,10 +26,11 @@ const results = await searchProducts("AirPods Pro", 10)
 // results.data => [{ shopsavvy, title, brand, barcode, ... }]
 
 const offers = await getOffers("012345678905")
-// offers.data[0].offers => [{ retailer: "amazon.com", price: 189.99, URL, ... }]
+// offers.data[0].offers => [{ retailer: "Amazon", price: 189.99, URL, ... }]
 
 const history = await getPriceHistory("012345678905", 180)
-// history.data => [{ retailer, history: [{ timestamp, price }] }]
+// history.data => one entry per product: [{ title, offers: [{ retailer, history: [{ timestamp, price, currency, availability }] }] }]
+// (history is newest first; a point's currency is null when none was recorded)
 
 const deals = await getDeals({ category: "electronics", limit: 8, sort: "top-day" })
 // deals.deals => [{ title, grade, pricing, retailer, url, votes }]

@@ -12,33 +12,37 @@ export interface ApiMeta {
   rate_limit_remaining?: number
 }
 
+// The API passes these product/offer fields straight through from their records, so
+// an unknown value arrives as an explicit JSON `null`, not an absent key.
 export interface Product {
   /** ShopSavvy product ID */
   shopsavvy: string
   title: string
-  brand?: string
-  category?: string
+  brand?: string | null
+  category?: string | null
   images?: string[]
-  barcode?: string
+  barcode?: string | null
   /** Amazon ASIN */
-  amazon?: string
-  model?: string
-  mpn?: string
-  color?: string
+  amazon?: string | null
+  model?: string | null
+  mpn?: string | null
+  color?: string | null
   [key: string]: unknown
 }
 
 export interface Offer {
   id: string
-  /** Retailer domain, e.g. "amazon.com" */
-  retailer?: string
-  price?: number
-  currency?: string
+  /** Retailer name, e.g. "Amazon" */
+  retailer?: string | null
+  price?: number | null
+  currency?: string | null
+  /** "in" / "out"; absent when unknown. */
   availability?: string
-  condition?: string
-  URL?: string
-  seller?: string
-  timestamp?: string
+  condition?: string | null
+  URL?: string | null
+  /** Marketplace seller; null on first-party offers. */
+  seller?: string | null
+  timestamp?: string | null
   [key: string]: unknown
 }
 
@@ -49,12 +53,20 @@ export interface ProductWithOffers extends Product {
 export interface PriceHistoryPoint {
   timestamp: string
   price: number
+  /** Null on an archived point with no recorded currency — never assume USD. */
   currency?: string | null
+  /** "in" / "out"; absent when unknown. */
   availability?: string
 }
 
 export interface OfferWithHistory extends Offer {
+  /** Newest first. Empty when the window has no points (e.g. eBay listings). */
   history: PriceHistoryPoint[]
+}
+
+/** One product in a price-history response: the product, its offers, each offer's history. */
+export interface ProductWithOfferHistory extends Product {
+  offers: OfferWithHistory[]
 }
 
 export interface SearchResponse {
@@ -70,9 +82,13 @@ export interface OffersResponse {
   meta?: ApiMeta
 }
 
+/**
+ * GET /products/offers/history, passed through unchanged by the Rust command:
+ * one entry PER PRODUCT, each with its offers, each offer carrying its history.
+ */
 export interface PriceHistoryResponse {
   success: boolean
-  data: OfferWithHistory[]
+  data: ProductWithOfferHistory[]
   meta?: ApiMeta
 }
 
@@ -126,7 +142,7 @@ export async function getOffers(identifier: string): Promise<OffersResponse> {
   return invoke<OffersResponse>(`${PLUGIN}|get_offers`, { identifier })
 }
 
-/** Price history for the last `days` days, per retailer offer. */
+/** Price history for the last `days` days: products -> offers -> history (newest first). */
 export async function getPriceHistory(identifier: string, days?: number): Promise<PriceHistoryResponse> {
   return invoke<PriceHistoryResponse>(`${PLUGIN}|get_price_history`, { identifier, days })
 }
