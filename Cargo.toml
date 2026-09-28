@@ -7,7 +7,11 @@ homepage = "https://shopsavvy.com/integrations/tauri"
 repository = "https://github.com/shopsavvy/tauri-plugin-shopsavvy"
 license = "MIT"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.77.2"
+readme = "README.md"
+# Lets the app's tauri-build find this plugin's permission files (see build.rs).
+links = "tauri-plugin-shopsavvy"
+exclude = ["/guest-js", "/examples", "/test.sh", "/.github"]
 keywords = ["tauri", "tauri-plugin", "shopsavvy", "shopping", "ecommerce"]
 categories = ["api-bindings", "web-programming"]
 
@@ -17,7 +21,18 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 thiserror = "1.0"
-tokio = { version = "1", features = ["macros", "rt"] }
+
+[build-dependencies]
+tauri-plugin = { version = "2.0.0", features = ["build"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "net", "io-util"] }
+tauri-utils = "2.0.0"
+toml = "0.8"
 
 [package.metadata.docs.rs]
 all-features = true
+
+[dev-dependencies.tauri]
+version = "2.0.0"
+features = ["test"]

@@ -1,4 +1,4 @@
-"$schema" = "../gen/schemas/default-input-schema.json"
+"$schema" = "schemas/schema.json"
 
 [default]
 description = "Default permissions for tauri-plugin-shopsavvy."
